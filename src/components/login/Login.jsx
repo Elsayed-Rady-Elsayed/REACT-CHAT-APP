@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import "./login.css";
 import avatar from "../../../public/avatar.png";
 import { toast } from "react-toastify";
+import { auth, db } from "../../lib/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 const Login = () => {
   const [selectImg, setSelectImg] = useState({
     file: null,
@@ -20,6 +23,34 @@ const Login = () => {
     toast.warn("hello");
     toast.success("ggg");
   };
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const { name, email, password } = Object.fromEntries(formData);
+    try {
+      const response = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      await setDoc(doc(db, "users", response.user.uid), {
+        name,
+        email,
+        id: response.user.uid,
+        blocked: [],
+      });
+
+      await setDoc(doc(db, "userChats", response.user.uid), {
+        chats: [],
+      });
+
+      toast.success("Your Account Created Successfully");
+    } catch (e) {
+      console.log(e);
+      toast.error(e.message);
+    }
+  };
   return (
     <div className="login">
       <div className="item">
@@ -33,7 +64,7 @@ const Login = () => {
       <div className="separtor"></div>
       <div className="item">
         <h2>Create Account</h2>
-        <form action="">
+        <form action="" onSubmit={handleRegister}>
           <input type="email" placeholder="Email" name="email" />
           <input type="text" placeholder="Name" name="name" />
           <input
