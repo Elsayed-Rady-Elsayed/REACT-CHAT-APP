@@ -5,11 +5,13 @@ import { toast } from "react-toastify";
 import { auth, db } from "../../lib/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
+import uplode from "../../lib/uplode";
 const Login = () => {
   const [selectImg, setSelectImg] = useState({
     file: null,
     url: "",
   });
+  const [loading, setLoading] = useState(false);
   const handleAvatar = (e) => {
     if (e.target.files[0]) {
       setSelectImg({
@@ -25,6 +27,7 @@ const Login = () => {
   };
   const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
     const formData = new FormData(e.target);
     const { name, email, password } = Object.fromEntries(formData);
     try {
@@ -34,9 +37,12 @@ const Login = () => {
         password
       );
 
+      const imgUrl = await uplode(selectImg.file);
+
       await setDoc(doc(db, "users", response.user.uid), {
         name,
         email,
+        avatar: imgUrl,
         id: response.user.uid,
         blocked: [],
       });
@@ -46,9 +52,12 @@ const Login = () => {
       });
 
       toast.success("Your Account Created Successfully");
+      setLoading(false);
     } catch (e) {
       console.log(e);
       toast.error(e.message);
+    } finally {
+      setLoading(false);
     }
   };
   return (
@@ -58,7 +67,9 @@ const Login = () => {
         <form action="" onSubmit={handleLogin}>
           <input type="email" placeholder="Email" name="email" />
           <input type="password" placeholder="Password" name="password" />
-          <button>Sign In</button>
+          <button disabled={loading}>
+            {loading ? "Loading..." : "Sign In"}
+          </button>
         </form>
       </div>
       <div className="separtor"></div>
@@ -78,7 +89,10 @@ const Login = () => {
             uplode personal image
           </label>
           <input type="password" placeholder="Password" name="password" />
-          <button>Sign In</button>
+          <button disabled={loading}>
+            {" "}
+            {loading ? "Loading..." : "Sign Up"}
+          </button>
         </form>
       </div>
     </div>
