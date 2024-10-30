@@ -32,14 +32,20 @@ const Detail = () => {
             <img src={arrowDown} alt="" />
           </div>
           <div className="photos">
-            <div className="photoItem">
-              <img
-                src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
-                alt=""
-              />
-              <span>random text</span>
-            </div>
-            <img src={download} alt="" />
+            {[1, 2, 3, 4, 5].map((el) => {
+              return (
+                <div className="photoItem">
+                  <div className="photoDetail">
+                    <img
+                      src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+                      alt=""
+                    />
+                    <span>random text</span>
+                  </div>
+                  <img src={download} alt="" className="downloadImg" />
+                </div>
+              );
+            })}
           </div>
         </div>
         <div className="option">
