@@ -4,6 +4,7 @@ import avatar from "../../../public/avatar.png";
 import arrow from "../../../public/arrowUp.png";
 import arrowDown from "../../../public/arrowDown.png";
 import download from "../../../public/download.png";
+import { auth } from "../../lib/firebase";
 
 const Detail = () => {
   return (
@@ -55,7 +56,9 @@ const Detail = () => {
           </div>
         </div>
         <button>block</button>
-        <button className="logout">LogOut</button>
+        <button className="logout" onClick={() => auth.signOut()}>
+          LogOut
+        </button>
       </div>
     </div>
   );

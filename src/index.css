@@ -31,3 +31,9 @@ body {
 ::-webkit-scrollbar-thumb {
   background-color: black;
 }
+.loading {
+  padding: 50px;
+  font-style: 36px;
+  border-radius: 10px;
+  background-color: rgba(17, 25, 40, 0.5);
+}

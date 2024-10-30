@@ -6,18 +6,27 @@ import Login from "./components/login/Login";
 import Notification from "./components/notifiactaion/Notification";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./lib/firebase";
+import { useUserStore } from "./lib/store";
 
 const App = () => {
+  const { currentUser, isLoading, fetchUserInfo } = useUserStore();
+
   useEffect(() => {
-    const unSub = onAuthStateChanged(auth, (user) => {});
+    const unSub = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchUserInfo(user.uid);
+      } else {
+        fetchUserInfo(null);
+      }
+    });
     return () => {
       unSub();
     };
   }, []);
-  const user = false;
+  if (isLoading) return <div className="loading">Loading....</div>;
   return (
     <div className="container">
-      {user ? (
+      {currentUser ? (
         <>
           <List />
           <Chat />
