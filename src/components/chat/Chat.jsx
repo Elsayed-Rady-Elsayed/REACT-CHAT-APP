@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./chat.css";
 import avatarImg from "../../../public/avatar.png";
 import phoneImg from "../../../public/phone.png";
@@ -12,9 +12,14 @@ import EmojiPicker from "emoji-picker-react";
 const Chat = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const endRef = useRef(null);
+  useEffect(() => {
+    endRef.current.scrollIntoView({ behavior: "smooth" });
+  });
   const handleEmoji = (e) => {
     setMessage((prev) => prev + e.emoji);
   };
+
   return (
     <div className="chat">
       <div className="top">
@@ -56,6 +61,27 @@ const Chat = () => {
             <span>1 min ago</span>
           </div>
         </div>
+        <div className="message own">
+          <div className="texts">
+            <img
+              src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+              alt=""
+            />
+            <p>hello bto</p>
+            <span>1 min ago</span>
+          </div>
+        </div>{" "}
+        <div className="message own">
+          <div className="texts">
+            <img
+              src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
+              alt=""
+            />
+            <p>hello bto</p>
+            <span>1 min ago</span>
+          </div>
+        </div>
+        <div ref={endRef}></div>
       </div>
       <div className="bottom">
         <div className="icons">
