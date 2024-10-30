@@ -4,6 +4,7 @@ import searchImg from "../../../../public/search.png";
 import plusImg from "../../../../public/plus.png";
 import minusImg from "../../../../public/minus.png";
 import avatarImg from "../../../../public/avatar.png";
+import AddUser from "./addUser/AddUser";
 
 const ChatList = () => {
   const [addMode, setAddMode] = useState(false);
@@ -51,6 +52,7 @@ const ChatList = () => {
           <p>hello now</p>
         </div>
       </div>
+      {addMode && <AddUser />}
     </div>
   );
 };
