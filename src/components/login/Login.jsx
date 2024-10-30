@@ -3,7 +3,10 @@ import "./login.css";
 import avatar from "../../../public/avatar.png";
 import { toast } from "react-toastify";
 import { auth, db } from "../../lib/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import uplode from "../../lib/uplode";
 const Login = () => {
@@ -20,10 +23,21 @@ const Login = () => {
       });
     }
   };
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    toast.warn("hello");
-    toast.success("ggg");
+    setLoading(true);
+    const formData = new FormData(e.target);
+    const { email, password } = Object.fromEntries(formData);
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      setLoading(false);
+      toast.success("logined successfully");
+    } catch (e) {
+      console.log(e);
+      toast.error(e.message);
+    } finally {
+      setLoading(false);
+    }
   };
   const handleRegister = async (e) => {
     e.preventDefault();
