@@ -57,7 +57,7 @@ const AddUser = () => {
       await updateDoc(doc(userChatRef, currentUser.id), {
         chats: arrayUnion({
           chatId: newChatRef.id,
-          lastMessage: "no",
+          lastMessage: "",
           receiverId: user.id,
           updatedAt: Date.now(),
           isSeen: false,
@@ -83,7 +83,7 @@ const AddUser = () => {
         <div className="user">
           <div className="detail">
             <img src={user.avatar || avatarImg} alt="" />
-            <span>sayed rady</span>
+            <span>{user.name}</span>
           </div>
           <button onClick={handleAddUser}>add user</button>
         </div>
