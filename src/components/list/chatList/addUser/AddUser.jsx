@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./adduser.css";
 import {
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -8,13 +9,16 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../../../../lib/firebase";
 import avatarImg from "../../../../../public/avatar.png";
+import { useUserStore } from "../../../../lib/store";
 
 const AddUser = () => {
   const [user, setUser] = useState(null);
+  const { currentUser } = useUserStore();
   const handleSearch = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -38,8 +42,28 @@ const AddUser = () => {
       const newChatRef = doc(chatRef);
       await setDoc(newChatRef, {
         createdAt: serverTimestamp(),
-        message: [],
+        messages: [],
       });
+
+      await updateDoc(doc(userChatRef, user.id), {
+        chats: arrayUnion({
+          chatId: newChatRef.id,
+          lastMessage: "no",
+          receiverId: currentUser.id,
+          updatedAt: Date.now(),
+          isSeen: false,
+        }),
+      });
+      await updateDoc(doc(userChatRef, currentUser.id), {
+        chats: arrayUnion({
+          chatId: newChatRef.id,
+          lastMessage: "no",
+          receiverId: user.id,
+          updatedAt: Date.now(),
+          isSeen: false,
+        }),
+      });
+
       console.log(newChatRef.id);
     } catch (err) {
       console.log(err);

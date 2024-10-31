@@ -9,10 +9,24 @@ import imgImg from "../../../public/img.png";
 import cameraImg from "../../../public/camera.png";
 import micImg from "../../../public/mic.png";
 import EmojiPicker from "emoji-picker-react";
+import {
+  onSnapshot,
+  doc,
+  updateDoc,
+  arrayUnion,
+  getDoc,
+} from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useChatStore } from "../../lib/chatStore";
+import { useUserStore } from "../../lib/store";
 const Chat = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [chat, setChat] = useState();
   const endRef = useRef(null);
+  const { chatId, user } = useChatStore();
+  const { currentUser } = useUserStore();
+
   useEffect(() => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
   });
@@ -20,6 +34,49 @@ const Chat = () => {
     setMessage((prev) => prev + e.emoji);
   };
 
+  useEffect(() => {
+    const unSup = onSnapshot(doc(db, "chats", chatId), (res) => {
+      setChat(res.data());
+    });
+    return () => {
+      unSup();
+    };
+  }, [chatId]);
+
+  const handleSend = async () => {
+    if (message == "") {
+      return;
+    }
+    try {
+      await updateDoc(doc(db, "chats", chatId), {
+        messages: arrayUnion({
+          senderId: currentUser.id,
+          text: message,
+          createdAt: new Date(),
+        }),
+      });
+      const userIds = [currentUser.id, user.id];
+      userIds.forEach(async (id) => {
+        const userChatRef = doc(db, "userChats", id);
+        const userChatSnapShot = await getDoc(userChatRef);
+        if (userChatSnapShot.exists()) {
+          const userChatData = userChatSnapShot.data();
+          const chatIndex = userChatData.chats.findIndex(
+            (c) => c.chatId === chatId
+          );
+          userChatData.chats[chatIndex].lastMessage = message;
+          userChatData.chats[chatIndex].isSeen =
+            id === currentUser.id ? true : false;
+          userChatData.chats[chatIndex].updatedAt = Date.now();
+          await updateDoc(userChatRef, {
+            chats: userChatData.chats,
+          });
+        }
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <div className="chat">
       <div className="top">
@@ -37,50 +94,17 @@ const Chat = () => {
         </div>
       </div>
       <div className="center">
-        <div className="message">
-          <img src={avatarImg} alt="" />
-          <div className="texts">
-            <p>hello bto</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message">
-          <img src={avatarImg} alt="" />
-          <div className="texts">
-            <p>hello bto</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <img
-              src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
-              alt=""
-            />
-            <p>hello bto</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
-        <div className="message own">
-          <div className="texts">
-            <img
-              src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
-              alt=""
-            />
-            <p>hello bto</p>
-            <span>1 min ago</span>
-          </div>
-        </div>{" "}
-        <div className="message own">
-          <div className="texts">
-            <img
-              src="https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg"
-              alt=""
-            />
-            <p>hello bto</p>
-            <span>1 min ago</span>
-          </div>
-        </div>
+        {chat?.messages?.map((el) => {
+          return (
+            <div className="message own" key={el.createdAt}>
+              <div className="texts">
+                {el.img && <img src={el.img} alt="" />}
+                <p>{el.text}</p>
+                {/* <span>{el.createdAt}</span> */}
+              </div>
+            </div>
+          );
+        })}
         <div ref={endRef}></div>
       </div>
       <div className="bottom">
@@ -101,7 +125,9 @@ const Chat = () => {
             <EmojiPicker open={open} onEmojiClick={handleEmoji} />
           </div>
         </div>
-        <button className="sendBtn">send</button>
+        <button className="sendBtn" onClick={handleSend}>
+          send
+        </button>
       </div>
     </div>
   );
