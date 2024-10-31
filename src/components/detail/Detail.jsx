@@ -15,6 +15,8 @@ const Detail = () => {
   const { currentUser } = useUserStore();
 
   const handleBlock = async () => {
+    console.log(user);
+
     if (!user) return;
     const userDocRef = doc(db, "users", currentUser.id);
     try {
@@ -24,7 +26,10 @@ const Detail = () => {
       changeBlock();
     } catch (e) {}
     changeBlock();
+    window.location.reload();
   };
+  console.log(isrecieverBlocked);
+
   return (
     <div className="detail">
       <div className="user">

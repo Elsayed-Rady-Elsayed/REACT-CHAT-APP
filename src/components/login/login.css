@@ -5,6 +5,7 @@
   align-items: center;
   justify-content: center;
   gap: 100px;
+  overflow-y: scroll;
   .item {
     flex: 1;
     display: flex;
@@ -63,5 +64,22 @@
     height: 80%;
     width: 2px;
     background-color: #dddddd35;
+  }
+}
+@media (max-width: 600px) {
+  .login {
+    margin-top: 20px;
+    padding: 10px 0px;
+    flex-direction: column;
+    gap: 10px;
+    .item {
+      form {
+        width: 100%;
+      }
+    }
+  }
+  .separtor {
+    width: 100% !important;
+    height: 1px !important;
   }
 }

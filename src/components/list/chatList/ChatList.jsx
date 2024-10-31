@@ -66,8 +66,15 @@ const ChatList = () => {
       console.log(error);
     }
   };
+  const [viewdList, setViewedList] = useState([]);
   let filterdChats = chats.filter((e) => e.user.name.includes(serachFriend));
-
+  useEffect(() => {
+    if (filterdChats.length == 0) {
+      setViewedList(chats);
+    } else {
+      setViewedList(filterdChats);
+    }
+  }, [serachFriend]);
   return (
     <div className="chatlist">
       <div className="search">
@@ -90,10 +97,10 @@ const ChatList = () => {
           }}
         />
       </div>
-      {chats.length === 0 ? (
+      {viewdList.length === 0 ? (
         <p></p>
       ) : (
-        filterdChats.map((el) => (
+        viewdList.map((el) => (
           <div
             key={el.chatId}
             className="item"
