@@ -48,7 +48,7 @@ const AddUser = () => {
       await updateDoc(doc(userChatRef, user.id), {
         chats: arrayUnion({
           chatId: newChatRef.id,
-          lastMessage: "no",
+          lastMessage: "",
           receiverId: currentUser.id,
           updatedAt: Date.now(),
           isSeen: false,
