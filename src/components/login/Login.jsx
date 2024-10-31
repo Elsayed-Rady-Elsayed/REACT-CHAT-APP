@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./login.css";
 import avatar from "../../../public/avatar.png";
 import { toast } from "react-toastify";
@@ -14,6 +14,7 @@ const Login = () => {
     file: null,
     url: "",
   });
+
   const [loading, setLoading] = useState(false);
   const handleAvatar = (e) => {
     if (e.target.files[0]) {
@@ -74,9 +75,11 @@ const Login = () => {
       setLoading(false);
     }
   };
+  const loginRef = useRef();
+  const registerRef = useRef();
   return (
     <div className="login">
-      <div className="item">
+      <div className="item" ref={loginRef}>
         <h2>welcome back,</h2>
         <form action="" onSubmit={handleLogin}>
           <input type="email" placeholder="Email" name="email" />
@@ -84,10 +87,21 @@ const Login = () => {
           <button disabled={loading}>
             {loading ? "Loading..." : "Sign In"}
           </button>
+          <p>
+            don't have an account?
+            <span
+              onClick={() => {
+                loginRef.current.classList.add("hidden");
+                registerRef.current.classList.remove("hidden");
+              }}
+            >
+              signup
+            </span>
+          </p>
         </form>
       </div>
       <div className="separtor"></div>
-      <div className="item">
+      <div className="item hidden" ref={registerRef}>
         <h2>Create Account</h2>
         <form action="" onSubmit={handleRegister}>
           <input type="email" placeholder="Email" name="email" />
@@ -107,6 +121,17 @@ const Login = () => {
             {" "}
             {loading ? "Loading..." : "Sign Up"}
           </button>
+          <p>
+            have an account?
+            <span
+              onClick={() => {
+                loginRef.current.classList.remove("hidden");
+                registerRef.current.classList.add("hidden");
+              }}
+            >
+              signin
+            </span>
+          </p>
         </form>
       </div>
     </div>

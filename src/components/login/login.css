@@ -59,6 +59,12 @@
         }
       }
     }
+    &.hidden {
+      display: none;
+    }
+    &.visible {
+      display: flex;
+    }
   }
   .separtor {
     height: 80%;
@@ -79,7 +85,6 @@
     }
   }
   .separtor {
-    width: 100% !important;
-    height: 1px !important;
+    display: none;
   }
 }
