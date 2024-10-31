@@ -116,6 +116,9 @@
       padding: 14px;
       border-radius: 10px;
       font-style: 16px;
+      &:disabled {
+        cursor: not-allowed;
+      }
     }
     .emojies {
       position: relative;
@@ -132,6 +135,10 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      &:disabled {
+        cursor: not-allowed;
+        background-color: #5182feb4;
+      }
     }
   }
 }

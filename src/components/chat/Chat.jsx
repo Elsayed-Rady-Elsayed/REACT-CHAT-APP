@@ -19,14 +19,27 @@ import {
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
 import { useUserStore } from "../../lib/store";
+import uplode from "../../lib/uplode";
 const Chat = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState();
   const endRef = useRef(null);
-  const { chatId, user } = useChatStore();
+  const { chatId, user, isCurrentUserBlocked, isrecieverBlocked } =
+    useChatStore();
   const { currentUser } = useUserStore();
-
+  const [img, setImg] = useState({
+    file: null,
+    url: "",
+  });
+  const handleImg = (e) => {
+    if (e.target.files[0]) {
+      setImg({
+        file: e.target.files[0],
+        url: URL.createObjectURL(e.target.files[0]),
+      });
+    }
+  };
   useEffect(() => {
     endRef.current.scrollIntoView({ behavior: "smooth" });
   });
@@ -47,12 +60,17 @@ const Chat = () => {
     if (message == "") {
       return;
     }
+    let imgUrl = null;
     try {
+      if (img.file) {
+        imgUrl = await uplode(img.file);
+      }
       await updateDoc(doc(db, "chats", chatId), {
         messages: arrayUnion({
           senderId: currentUser.id,
           text: message,
           createdAt: new Date(),
+          ...(imgUrl && { img: imgUrl }),
         }),
       });
       const userIds = [currentUser.id, user.id];
@@ -76,15 +94,20 @@ const Chat = () => {
     } catch (err) {
       console.log(err);
     }
+    setImg({
+      file: null,
+      url: "",
+    });
+    setMessage("");
   };
   return (
     <div className="chat">
       <div className="top">
         <div className="user">
-          <img src={avatarImg} alt="" />
+          <img src={user?.avatar || avatarImg} alt="" />
           <div className="texts">
-            <span>sayed rady</span>
-            <p>hello world</p>
+            <span>{user?.name}</span>
+            <p>hey there send me </p>
           </div>
         </div>
         <div className="icons">
@@ -96,7 +119,12 @@ const Chat = () => {
       <div className="center">
         {chat?.messages?.map((el) => {
           return (
-            <div className="message own" key={el.createdAt}>
+            <div
+              className={
+                el.senderId === currentUser.id ? "message own" : "message"
+              }
+              key={el.createdAt}
+            >
               <div className="texts">
                 {el.img && <img src={el.img} alt="" />}
                 <p>{el.text}</p>
@@ -105,11 +133,30 @@ const Chat = () => {
             </div>
           );
         })}
+        {img.url && (
+          <div
+            className={
+              message.senderId === currentUser.id ? "message own" : "message"
+            }
+          >
+            <div className="texts">
+              <img src={img.url} alt="" />
+            </div>
+          </div>
+        )}
         <div ref={endRef}></div>
       </div>
       <div className="bottom">
         <div className="icons">
-          <img src={imgImg} alt="" />
+          <label htmlFor="file">
+            <img src={imgImg} alt="" />
+          </label>
+          <input
+            type="file"
+            onChange={handleImg}
+            id="file"
+            style={{ display: "none" }}
+          />
           <img src={cameraImg} alt="" />
           <img src={micImg} alt="" />
         </div>
@@ -117,6 +164,7 @@ const Chat = () => {
           type="text"
           value={message}
           placeholder="write message"
+          disabled={isCurrentUserBlocked || isrecieverBlocked}
           onChange={(e) => setMessage(e.target.value)}
         />
         <div className="emojies">
@@ -125,7 +173,11 @@ const Chat = () => {
             <EmojiPicker open={open} onEmojiClick={handleEmoji} />
           </div>
         </div>
-        <button className="sendBtn" onClick={handleSend}>
+        <button
+          className="sendBtn"
+          onClick={handleSend}
+          disabled={isCurrentUserBlocked || isrecieverBlocked}
+        >
           send
         </button>
       </div>

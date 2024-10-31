@@ -32,7 +32,7 @@ const App = () => {
         <>
           <List />
           {chatId && <Chat />}
-          <Detail />
+          {chatId && <Detail />}
         </>
       ) : (
         <>

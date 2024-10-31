@@ -15,6 +15,7 @@ const ChatList = () => {
   const [chats, setChats] = useState([]);
   const { currentUser } = useUserStore();
   const { changeChat, chatId } = useChatStore();
+  const [serachFriend, setSearchFriend] = useState();
   useEffect(() => {
     if (!currentUser) return;
 
@@ -51,14 +52,34 @@ const ChatList = () => {
       const { user, ...rest } = el;
       return rest;
     });
-    changeChat(chat.chatId, chat.user);
+    const chatIndex = userChtas.findIndex(
+      (item) => item.chatId === chat.chatId
+    );
+    userChtas[chatIndex].isSeen = true;
+    const userChatsRef = doc(db, "userChats", currentUser.id);
+    try {
+      await updateDoc(userChatsRef, {
+        chats: userChtas,
+      });
+      changeChat(chat.chatId, chat.user);
+    } catch (error) {
+      console.log(error);
+    }
   };
+  let filterdChats = chats.filter((e) => e.user.name.includes(serachFriend));
+
   return (
     <div className="chatlist">
       <div className="search">
         <div className="searchBar">
           <img src={searchImg} alt="" />
-          <input type="text" placeholder="Search" />
+          <input
+            type="text"
+            placeholder="Search"
+            onChange={(e) => {
+              setSearchFriend(e.target.value);
+            }}
+          />
         </div>
         <img
           src={addMode ? minusImg : plusImg}
@@ -72,7 +93,7 @@ const ChatList = () => {
       {chats.length === 0 ? (
         <p></p>
       ) : (
-        chats.map((el) => (
+        filterdChats.map((el) => (
           <div
             key={el.chatId}
             className="item"
@@ -81,9 +102,20 @@ const ChatList = () => {
               backgroundColor: el.isSeen ? "transparent" : "#5183fe",
             }}
           >
-            <img src={el.user.avatar} alt="" />
+            <img
+              src={
+                el.user.blocked.includes(currentUser.id)
+                  ? avatarImg
+                  : el.user.avatar || avatarImg
+              }
+              alt=""
+            />
             <div className="texts">
-              <span>{el.user.name}</span>
+              <span>
+                {el.user.blocked.includes(currentUser.id)
+                  ? "user"
+                  : el.user.name}
+              </span>
               <p>{el.lastMessage}</p>
             </div>
           </div>
