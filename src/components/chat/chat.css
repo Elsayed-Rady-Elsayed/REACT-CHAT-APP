@@ -12,11 +12,6 @@
     align-items: center;
     justify-content: space-between;
     border-bottom: 1px solid #dddddd35;
-    @media (max-width: 600px) {
-      & {
-        /* justify-content: flex-start; */
-      }
-    }
     .user {
       display: flex;
       align-items: center;
@@ -42,15 +37,18 @@
         }
       }
       @media (max-width: 600px) {
+        & {
+          gap: 10px;
+        }
         img {
           width: 30px;
           height: 30px;
         }
         p {
-          font-size: 10px !important;
+          font-size: 8px !important;
         }
         span {
-          font-size: 14px !important;
+          font-size: 10px !important;
         }
       }
     }
@@ -187,6 +185,8 @@
       text-align: center;
       width: 100%;
       color: #dddddddd;
+    }
+    .emojies {
     }
   }
 }
