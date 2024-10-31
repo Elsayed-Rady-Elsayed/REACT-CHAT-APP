@@ -157,8 +157,6 @@ const Chat = () => {
             id="file"
             style={{ display: "none" }}
           />
-          <img src={cameraImg} alt="" />
-          <img src={micImg} alt="" />
         </div>
         <input
           type="text"
