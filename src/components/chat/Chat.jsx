@@ -16,6 +16,7 @@ import {
   updateDoc,
   arrayUnion,
   getDoc,
+  arrayRemove,
 } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useChatStore } from "../../lib/chatStore";
@@ -26,13 +27,27 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState();
   const endRef = useRef(null);
-  const { chatId, user, isCurrentUserBlocked, isrecieverBlocked } =
+  const { chatId, user, isCurrentUserBlocked, isrecieverBlocked, changeBlock } =
     useChatStore();
   const { currentUser } = useUserStore();
   const [img, setImg] = useState({
     file: null,
     url: "",
   });
+
+  const handleBlock = async () => {
+    const userDocRef = doc(db, "users", currentUser.id);
+    try {
+      await updateDoc(userDocRef, {
+        blocked: isrecieverBlocked ? arrayRemove(user.id) : arrayUnion(user.id),
+      });
+      changeBlock();
+    } catch (e) {
+      console.log(e);
+    }
+    window.location.reload();
+  };
+
   const handleImg = (e) => {
     if (e.target.files[0]) {
       setImg({
@@ -114,7 +129,7 @@ const Chat = () => {
         <div className="icons">
           <img src={phoneImg} alt="" />
           <img src={videoImg} alt="" />
-          <img src={infoImg} alt="" />
+          <img src={infoImg} alt="" onClick={handleBlock} />
         </div>
       </div>
       <div className="center">
@@ -148,38 +163,48 @@ const Chat = () => {
         <div ref={endRef}></div>
       </div>
       <div className="bottom">
-        <div className="icons">
-          <label htmlFor="file">
-            <img src={imgImg} alt="" />
-          </label>
-          <input
-            type="file"
-            onChange={handleImg}
-            id="file"
-            style={{ display: "none" }}
-          />
-        </div>
-        <div className="emojies">
-          <img src={emoji} alt="" onClick={() => setOpen((prev) => !prev)} />
-          <div className="emojieContainer">
-            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
-          </div>
-        </div>
-        <input
-          type="text"
-          value={message}
-          placeholder="write message"
-          disabled={isCurrentUserBlocked || isrecieverBlocked}
-          onChange={(e) => setMessage(e.target.value)}
-        />
+        {isCurrentUserBlocked || isrecieverBlocked ? (
+          <p className="warnChat">you cant chat with this user</p>
+        ) : (
+          <>
+            <div className="icons">
+              <label htmlFor="file">
+                <img src={imgImg} alt="" />
+              </label>
+              <input
+                type="file"
+                onChange={handleImg}
+                id="file"
+                style={{ display: "none" }}
+              />
+            </div>
+            <div className="emojies">
+              <img
+                src={emoji}
+                alt=""
+                onClick={() => setOpen((prev) => !prev)}
+              />
+              <div className="emojieContainer">
+                <EmojiPicker open={open} onEmojiClick={handleEmoji} />
+              </div>
+            </div>
+            <input
+              type="text"
+              value={message}
+              placeholder="write message"
+              disabled={isCurrentUserBlocked || isrecieverBlocked}
+              onChange={(e) => setMessage(e.target.value)}
+            />
 
-        <button
-          className="sendBtn"
-          onClick={handleSend}
-          disabled={isCurrentUserBlocked || isrecieverBlocked}
-        >
-          <img src={send} alt="" />
-        </button>
+            <button
+              className="sendBtn"
+              onClick={handleSend}
+              disabled={isCurrentUserBlocked || isrecieverBlocked}
+            >
+              <img src={send} alt="" />
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

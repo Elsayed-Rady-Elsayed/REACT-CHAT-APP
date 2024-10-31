@@ -25,10 +25,8 @@ const Detail = () => {
       });
       changeBlock();
     } catch (e) {}
-    changeBlock();
     window.location.reload();
   };
-  console.log(isrecieverBlocked);
 
   return (
     <div className="detail">
@@ -53,10 +51,10 @@ const Detail = () => {
         <div className="option">
           <div className="title">
             <span>Shared photos</span>
-            <img src={arrowDown} alt="" />
+            <img src={arrow} alt="" />
           </div>
           <div className="photos">
-            {[1, 2, 3, 4, 5].map((el) => {
+            {[].map((el) => {
               return (
                 <div className="photoItem">
                   <div className="photoDetail">
