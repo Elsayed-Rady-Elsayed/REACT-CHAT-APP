@@ -5,6 +5,7 @@ import phoneImg from "../../../public/phone.png";
 import videoImg from "../../../public/video.png";
 import infoImg from "../../../public/info.png";
 import emoji from "../../../public/emoji.png";
+import send from "../../../public/send.png";
 import imgImg from "../../../public/img.png";
 import cameraImg from "../../../public/camera.png";
 import micImg from "../../../public/mic.png";
@@ -158,6 +159,12 @@ const Chat = () => {
             style={{ display: "none" }}
           />
         </div>
+        <div className="emojies">
+          <img src={emoji} alt="" onClick={() => setOpen((prev) => !prev)} />
+          <div className="emojieContainer">
+            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
+          </div>
+        </div>
         <input
           type="text"
           value={message}
@@ -165,18 +172,13 @@ const Chat = () => {
           disabled={isCurrentUserBlocked || isrecieverBlocked}
           onChange={(e) => setMessage(e.target.value)}
         />
-        <div className="emojies">
-          <img src={emoji} alt="" onClick={() => setOpen((prev) => !prev)} />
-          <div className="emojieContainer">
-            <EmojiPicker open={open} onEmojiClick={handleEmoji} />
-          </div>
-        </div>
+
         <button
           className="sendBtn"
           onClick={handleSend}
           disabled={isCurrentUserBlocked || isrecieverBlocked}
         >
-          send
+          <img src={send} alt="" />
         </button>
       </div>
     </div>

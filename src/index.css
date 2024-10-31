@@ -30,6 +30,7 @@ body {
 @media (max-width: 600px) {
   .container {
     width: 95vw !important;
+    flex-direction: column;
   }
 }
 
